@@ -2,6 +2,7 @@
 #include "cache.h"
 #include "config.h"
 #include "branch.h"
+#include "refcounter.h"
 #include "refs.h"
 #include "remote.h"
 #include "commit.h"
@@ -323,6 +324,10 @@ void create_branch(const char *name, const char *start_name,
 
 void remove_branch_state(void)
 {
+    // DEBUG
+    int ec = get_ref_count("pimpis");
+    printf("%d !!!\n", ec);
+    exit(1); //FOR DEBUG
 	unlink(git_path_cherry_pick_head());
 	unlink(git_path_revert_head());
 	unlink(git_path_merge_head());

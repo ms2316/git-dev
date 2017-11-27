@@ -624,6 +624,8 @@ static int run_argv(int *argcp, const char ***argv)
 
 int cmd_main(int argc, const char **argv)
 {
+    printf("HELLO!\n");
+
 	const char *cmd;
 	int done_help = 0;
 
@@ -653,6 +655,7 @@ int cmd_main(int argc, const char **argv)
 		handle_builtin(argc, argv);
 		die("cannot handle %s as a builtin", cmd);
 	}
+    printf("This comment is after if skip_prefix\n");
 
 	/* Look for flags.. */
 	argv++;
@@ -677,7 +680,10 @@ int cmd_main(int argc, const char **argv)
 	 * environment, and the $(gitexecdir) from the Makefile at build
 	 * time.
 	 */
+    printf("This comment is before setup_path\n");
 	setup_path();
+    printf("This comment is after setup_path\n");
+
 
 	while (1) {
 		int was_alias = run_argv(&argc, &argv);
