@@ -656,6 +656,8 @@ int cmd_main(int argc, const char **argv)
 		die("cannot handle %s as a builtin", cmd);
 	}
     printf("This comment is after if skip_prefix\n");
+    int ec = get_ref_count("pimpis");
+    printf("%d !!! \n", ec);
 
 	/* Look for flags.. */
 	argv++;
