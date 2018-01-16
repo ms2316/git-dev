@@ -1,13 +1,14 @@
-#ifndef REFCOUNTER_H
-#define REFCOUNTER_H
+#ifndef LEDGER_H
+#define LEDGER_H
 
+#include <db.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 /*
  * Returns number of references of an object with given key.
- * Non-zero(error) is returned if the key DNE or in case of DB related issues.
+ * -1 is returned if the key DNE or in case of DB related issues.
  */
 const int get_ref_count(const char* _key);
 
@@ -30,4 +31,4 @@ int inc_ref_count(const char* _key);
  */
 int dec_ref_count(const char* _key);
 
-#endif // REFCOUNTER_H
+#endif // LEDGER_H

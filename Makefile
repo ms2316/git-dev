@@ -803,6 +803,7 @@ LIB_OBJS += help.o
 LIB_OBJS += hex.o
 LIB_OBJS += ident.o
 LIB_OBJS += kwset.o
+LIB_OBJS += ledger.o
 LIB_OBJS += levenshtein.o
 LIB_OBJS += line-log.o
 LIB_OBJS += line-range.o
@@ -849,7 +850,6 @@ LIB_OBJS += prompt.o
 LIB_OBJS += quote.o
 LIB_OBJS += reachable.o
 LIB_OBJS += read-cache.o
-LIB_OBJS += refcounter.o
 LIB_OBJS += reflog-walk.o
 LIB_OBJS += refs.o
 LIB_OBJS += refs/files-backend.o
@@ -1019,7 +1019,7 @@ BUILTIN_OBJS += builtin/worktree.o
 BUILTIN_OBJS += builtin/write-tree.o
 
 GITLIBS = common-main.o $(LIB_FILE) $(XDIFF_LIB)
-EXTLIBS =
+EXTLIBS = /usr/local/Cellar/berkeley-db/6.2.32/lib/libdb.a
 
 GIT_USER_AGENT = git/$(GIT_VERSION)
 

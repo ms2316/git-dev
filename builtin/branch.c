@@ -256,6 +256,9 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			ret = 1;
 			goto next;
 		}
+		// Find out which commit 'name' references (points to)
+		// Commit hash is in .git/refs/"name"
+		// Save the hash of that commit
 
 		if (delete_ref(NULL, name, is_null_oid(&oid) ? NULL : &oid,
 			       REF_NODEREF)) {
@@ -266,6 +269,9 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			ret = 1;
 			goto next;
 		}
+		// If the reference was successfully deleted
+		// Decrement refcount of the commit and run tracing GC
+
 		if (!quiet) {
 			printf(remote_branch
 			       ? _("Deleted remote-tracking branch %s (was %s).\n")
