@@ -22,6 +22,7 @@
 #include "wt-status.h"
 #include "ref-filter.h"
 #include "worktree.h"
+#include "ledger.h"
 
 static const char * const builtin_branch_usage[] = {
 	N_("git branch [<options>] [-r | -a] [--merged | --no-merged]"),
@@ -57,6 +58,15 @@ enum color_branch {
 
 static struct string_list output = STRING_LIST_INIT_DUP;
 static unsigned int colopts;
+
+char* concat(const char *s1, const char *s2) {
+	const size_t len1 = strlen(s1);
+	const size_t len2 = strlen(s2);
+	char *result = malloc(len1+len2+1);
+	memcpy(result, s1, len1);
+	memcpy(result+len1, s2, len2+1);
+	return result;
+}
 
 static int parse_branch_color_slot(const char *slot)
 {
@@ -259,6 +269,19 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 		// Find out which commit 'name' references (points to)
 		// Commit hash is in .git/refs/"name"
 		// Save the hash of that commit
+		char* file_name = concat(".git/", name);
+		char cmt_hash[41];
+		FILE *ref_file;
+
+		if ((ref_file = fopen(file_name, "rt")) != NULL) {
+			if (fgets(cmt_hash, sizeof cmt_hash, ref_file) == cmt_hash) {
+				printf("read '%s' OK\n", cmt_hash);
+			} else {
+				printf("read error\n");
+			}
+			fclose(ref_file);
+			free(file_name);
+		}
 
 		if (delete_ref(NULL, name, is_null_oid(&oid) ? NULL : &oid,
 			       REF_NODEREF)) {
@@ -268,6 +291,14 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			      bname.buf);
 			ret = 1;
 			goto next;
+		}
+		//int a = get_ref_count("huj");
+		if (dec_ref_count(cmt_hash) != 0) {
+			printf("Error decrementing refcount in builtin/branch.c\n");
+		}
+		if (is_garbage(cmt_hash)) {
+			//delete it
+			//run tracing GC
 		}
 		// If the reference was successfully deleted
 		// Decrement refcount of the commit and run tracing GC
