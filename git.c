@@ -1,4 +1,3 @@
-#include <db.h>
 #include "builtin.h"
 #include "config.h"
 #include "exec_cmd.h"

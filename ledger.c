@@ -76,7 +76,7 @@ int add_to_db_overwriting(const char* _key, int count) {
 	memset(&key, 0, sizeof(key));
 	memset(&data, 0, sizeof(data));
 
-	key.data = _key;
+	key.data = (char*)_key;
 	key.size = sizeof(char)*strlen(_key);
 	data.data = &count;
 	data.size = sizeof(int);
@@ -104,7 +104,7 @@ const int get_ref_count(const char* _key) {
 	memset(&key, 0, sizeof(key));
 	memset(&data, 0, sizeof(data));
 
-	key.data = _key;
+	key.data = (char*)_key;
 	key.size = sizeof(char)*strlen(_key);
 	data.data = &count;
 	data.size = sizeof(int);
