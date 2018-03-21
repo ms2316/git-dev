@@ -34,6 +34,8 @@
 #include "notes-utils.h"
 #include "mailmap.h"
 #include "sigchain.h"
+#include "ledger.h"
+#include "refcounter.h"
 
 static const char * const builtin_commit_usage[] = {
 	N_("git commit [<options>] [--] <pathspec>..."),
@@ -1788,6 +1790,7 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 	strbuf_insert(&sb, 0, reflog_msg, strlen(reflog_msg));
 	strbuf_insert(&sb, strlen(reflog_msg), ": ", 2);
 
+	// There git commit happens
 	transaction = ref_transaction_begin(&err);
 	if (!transaction ||
 	    ref_transaction_update(transaction, "HEAD", &oid,
@@ -1798,6 +1801,16 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 		rollback_index_files();
 		die("%s", err.buf);
 	}
+
+	// Lookup hash of new commit and increment
+	const char* cmt_hash;
+	if ((cmt_hash = get_hex_hash_by_bname("HEAD")) == NULL) {
+		printf("Fail getting id of new commit\n");
+	} else {
+		inc_ref_count(cmt_hash);
+	}
+	free((char*)cmt_hash);
+
 	ref_transaction_free(transaction);
 
 	unlink(git_path_cherry_pick_head());
