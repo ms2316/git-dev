@@ -2,11 +2,12 @@
 #include "cache.h"
 #include "config.h"
 #include "branch.h"
-#include "ledger.h"
 #include "refs.h"
 #include "remote.h"
 #include "commit.h"
 #include "worktree.h"
+#include "ledger.h"
+#include "refcounter.h"
 
 struct tracking {
 	struct refspec spec;
@@ -318,16 +319,19 @@ void create_branch(const char *name, const char *start_name,
 	if (real_ref && track)
 		setup_tracking(ref.buf + 11, real_ref, track, quiet);
 
+	const char* cmt_hash;
+	if ((cmt_hash = get_hex_hash_by_bname(start_name)) == NULL) {
+		printf("Problema nah in branch.c create_branch\n");
+	} else {
+		inc_ref_count(cmt_hash);
+	}
+
 	strbuf_release(&ref);
 	free(real_ref);
 }
 
 void remove_branch_state(void)
 {
-	// DEBUG
-	//int ec = get_ref_count("pimpis");
-	//printf("%d !!!\n", ec);
-	//exit(1); //FOR DEBUG
 	unlink(git_path_cherry_pick_head());
 	unlink(git_path_revert_head());
 	unlink(git_path_merge_head());
