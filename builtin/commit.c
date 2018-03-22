@@ -1809,7 +1809,6 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 	} else {
 		inc_ref_count(cmt_hash);
 	}
-	free((char*)cmt_hash);
 
 	ref_transaction_free(transaction);
 

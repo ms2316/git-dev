@@ -284,7 +284,6 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 				//delete it
 				//run tracing GC
 			}
-			free((char*)cmt_hash);
 		}
 		// If the reference was successfully deleted
 		// Decrement refcount of the commit and run tracing GC
