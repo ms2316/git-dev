@@ -261,10 +261,12 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 		// Find out which commit 'name' references (points to)
 		// Commit hash is in .git/refs/"name"
 		// Save the hash of that commit
-		const char* cmt_hash;
-		if ((cmt_hash = get_hex_hash_by_bname(bname.buf)) == NULL) {
-			printf("Failure getting commit hash in builtin/branch.c\n");
-		}
+		struct object_id cid;
+		if (get_oid(bname.buf, &cid))
+			printf("Failure getting id of commit in builtin/branch.c\n");
+		struct commit* cmt = lookup_commit_reference(&cid);
+		if (!cmt)
+			printf("Couldnt lookup commit\n");
 
 		if (delete_ref(NULL, name, is_null_oid(&oid) ? NULL : &oid,
 			       REF_NODEREF)) {
@@ -276,13 +278,9 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			goto next;
 		}
 
-		if (cmt_hash) {
-			if (dec_ref_count(cmt_hash) != 0) {
-				printf("Error decr refcount in builtin/branch.c\n");
-			}
-			if (is_garbage(cmt_hash)) {
-				//delete it
-				//run tracing GC
+		if (cmt) {
+			if (refcount_dec_gc(cmt)) {
+				printf("Refcounting GC exited with error\n");
 			}
 		}
 		// If the reference was successfully deleted
