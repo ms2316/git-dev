@@ -320,11 +320,10 @@ void create_branch(const char *name, const char *start_name,
 		setup_tracking(ref.buf + 11, real_ref, track, quiet);
 
 	const char* cmt_hash;
-	if ((cmt_hash = get_hex_hash_by_bname(start_name)) == NULL) {
-		printf("Problema nah in branch.c create_branch\n");
-	} else {
+	if ((cmt_hash = get_hex_hash_by_bname(start_name)))
 		inc_ref_count(cmt_hash);
-	}
+	else
+		printf("Couldn't get commit hash in branch.c/create_branch\n");
 
 	strbuf_release(&ref);
 	free(real_ref);

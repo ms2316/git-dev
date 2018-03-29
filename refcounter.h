@@ -22,4 +22,8 @@ int refcount_dec_gc(struct commit*);
  */
 int delete_object(struct object_id*);
 
+int delete_object_from_sha(const unsigned char*);
+
+int init_commit_refcount(struct commit*);
+
 #endif //REFCOUNTER_H

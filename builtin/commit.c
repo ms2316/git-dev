@@ -1790,7 +1790,6 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 	strbuf_insert(&sb, 0, reflog_msg, strlen(reflog_msg));
 	strbuf_insert(&sb, strlen(reflog_msg), ": ", 2);
 
-	// There git commit happens
 	transaction = ref_transaction_begin(&err);
 	if (!transaction ||
 	    ref_transaction_update(transaction, "HEAD", &oid,
@@ -1802,13 +1801,14 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 		die("%s", err.buf);
 	}
 
-	// Lookup hash of new commit and increment
-	const char* cmt_hash;
-	if ((cmt_hash = get_hex_hash_by_bname("HEAD")) == NULL) {
-		printf("Fail getting id of new commit\n");
-	} else {
-		inc_ref_count(cmt_hash);
-	}
+	// Lookup commit, init refcount for it and for objects in it's tree
+	struct object_id cid;
+	struct commit* cmt;
+	if (!get_oid("HEAD", &cid) && (cmt = lookup_commit_reference(&cid))) {
+		if (init_commit_refcount(cmt))
+			printf("Error initializing refcount for new commit\n");
+	} else
+		printf("Failure looking up commit in commit.c\n");
 
 	ref_transaction_free(transaction);
 
