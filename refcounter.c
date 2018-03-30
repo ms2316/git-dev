@@ -36,7 +36,6 @@ int delete_object_from_sha(const unsigned char* sha1) {
 	return delete_obj(hex);
 }
 
-
 int walk_tree_recursive(struct tree *tree) {
 	struct tree_desc desc;
 	struct name_entry entry;
@@ -95,7 +94,8 @@ int init_commit_refcount(struct commit *cmt) {
 	}
 
 	const char* tree_hash = oid_to_hex(&cmt->tree->object.oid);
-	inc_ref_count(tree_hash);
+	if (inc_ref_count(tree_hash))
+		printf("Error incrementing refcount of toptree %s\n", tree_hash);
 
 	if (get_ref_count(tree_hash) > 1)
 		return 0;
@@ -124,15 +124,15 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 	if (dec_ref_count(hash)) {
 		printf("Error decrementing refcount of object with hash\
 			%s in tree_gc\n", hash);
-	} else {
-		if (!is_garbage(hash))
-			return 0;
 	}
 
+	if (!is_garbage(hash))
+		return 0;
+
 	// At this point we know that hash is garbage
-	if (delete_object_from_sha(sha1)) {
-		printf("Error deleting tree in tree_gc\n");
-	}
+	if (delete_object_from_sha(sha1))
+		printf("Error deleting object in tree_gc\n");
+
 	if (S_ISDIR(mode))
 		return READ_TREE_RECURSIVE;
 
@@ -141,10 +141,9 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 
 int refcount_dec_gc(struct commit* cmt) {
 	int ret = 0;
-	if (!cmt->object.parsed) {
-		printf("Commit not parsed\n");
+	if (!cmt->object.parsed)
 		parse_commit_or_die(cmt);
-	}
+
 	const char* cmt_hash = oid_to_hex(&(cmt->object.oid));
 
 	if (dec_ref_count(cmt_hash))
@@ -153,14 +152,12 @@ int refcount_dec_gc(struct commit* cmt) {
 	if (!is_garbage(cmt_hash))
 		return 0;
 
-	printf("Getting tree_hash now\n");
 	// first work with tree
 	if (!cmt->tree->object.parsed) {
-		printf("Tree not parsed\n");
-		if (parse_tree(cmt->tree)) {
+		if (parse_tree(cmt->tree))
 			printf("Error parsing tree\n");
-		}
 	}
+
 	const char* tree_hash = oid_to_hex(&(cmt->tree->object.oid));
 
 	if (dec_ref_count(tree_hash))
@@ -179,9 +176,8 @@ int refcount_dec_gc(struct commit* cmt) {
 			printf("Error when reading_tree_recursive\n");
 		}
 
-		if (delete_object(&(cmt->tree->object.oid))) {
+		if (delete_object(&(cmt->tree->object.oid)))
 			printf("Error when deleting tree in refcount_dec_gc\n");
-		}
 	}
 
 	printf("Starting processing parents\n");
@@ -189,12 +185,13 @@ int refcount_dec_gc(struct commit* cmt) {
 		printf("Going into %s\n", oid_to_hex(&(l->item->object.oid)));
 		int retval = refcount_dec_gc(l->item);
 		printf("Returning\n");
-		if (!ret) ret = retval;
+		if (!ret)
+			ret = retval;
 	}
 	printf("Done with parents\n");
 
-	if ((ret = delete_object(&(cmt->object.oid)))) {
-		printf("Error %d when deleting commit in refcount_dec_gc\n", ret);
-	}
+	if (delete_object(&(cmt->object.oid)))
+		printf("Error when deleting commit in refcount_dec_gc\n");
+
 	return ret;
 }

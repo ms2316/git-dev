@@ -141,12 +141,15 @@ int dec_ref_count(const char* _key) {
 	int count = get_ref_count(_key);
 
 	if (count == 0) {
-		printf("Semantic Error: The refcount is already zero and can't be negative\n");
+		printf("Semantic Error: The refcount is already zero and can't\
+			be negative\n");
 		return -1;
-	} else if (count < 0) {
-		printf("Semantic Error: Trying to decrement refcount of a key not in DB\n");
-		return -1;
-	} else {
-		return add_to_db_overwriting(_key, count - 1);
 	}
+	if (count < 0) {
+		printf("Semantic Error: Trying to decrement refcount\
+			of a key not in DB\n");
+		return -1;
+	}
+
+	return add_to_db_overwriting(_key, count - 1);
 }
