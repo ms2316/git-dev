@@ -262,10 +262,9 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 		// Remember commit referenced by the branch
 		struct object_id cid;
 		struct commit* cmt;
-		if (get_oid(bname.buf, &cid))
-			printf("Failure getting id of commit in builtin/branch.c\n");
-		if (!(cmt = lookup_commit_reference(&cid)))
-			printf("Couldn't lookup commit\n");
+		if (get_oid(bname.buf, &cid) ||
+		    !(cmt = lookup_commit_reference(&cid)))
+			printf("Failure getting commit in builtin/branch.c\n");
 
 		if (delete_ref(NULL, name, is_null_oid(&oid) ? NULL : &oid,
 			       REF_NODEREF)) {
@@ -278,9 +277,8 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 		}
 
 		// Run refcounting GC on the remembered commit
-		if (cmt && refcount_dec_gc(cmt)) {
+		if (cmt && refcount_dec_gc(cmt, PROCESS_PARENTS))
 			printf("Refcounting GC exited with error\n");
-		}
 
 		if (!quiet) {
 			printf(remote_branch

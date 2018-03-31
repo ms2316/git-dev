@@ -10,6 +10,10 @@ Tests  reference counting garbage collector.'
 . ./test-lib.sh
 
 test_expect_success 'testing commit' '
+	GIT_AUTHOR_DATE="2006-06-26 00:00:00 +0000" &&
+	GIT_COMMITTER_DATE="2006-06-26 00:00:00 +0000" &&
+	export GIT_AUTHOR_DATE GIT_COMMITTER_DATE &&
+
 	echo a > a &&
 	git add a &&
 	git commit -m "single file" &&
@@ -24,10 +28,6 @@ test_expect_success 'testing commit' '
 '
 
 test_expect_success 'deleting branch should delete files' '
-	GIT_AUTHOR_DATE="2006-06-26 00:00:00 +0000" &&
-	GIT_COMMITTER_DATE="2006-06-26 00:00:00 +0000" &&
-	export GIT_AUTHOR_DATE GIT_COMMITTER_DATE &&
-
 	git checkout my_branch &&
 	echo c > c &&
 	git add c &&

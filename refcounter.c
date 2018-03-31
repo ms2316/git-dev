@@ -139,7 +139,7 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 	return 0;
 }
 
-int refcount_dec_gc(struct commit* cmt) {
+int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 	int ret = 0;
 	if (!cmt->object.parsed)
 		parse_commit_or_die(cmt);
@@ -180,15 +180,17 @@ int refcount_dec_gc(struct commit* cmt) {
 			printf("Error when deleting tree in refcount_dec_gc\n");
 	}
 
-	printf("Starting processing parents\n");
-	for (struct commit_list *l = cmt->parents; l; l = l->next) {
-		printf("Going into %s\n", oid_to_hex(&(l->item->object.oid)));
-		int retval = refcount_dec_gc(l->item);
-		printf("Returning\n");
-		if (!ret)
-			ret = retval;
+	if (traversal == PROCESS_PARENTS) {
+		printf("Starting processing parents\n");
+		for (struct commit_list *l = cmt->parents; l; l = l->next) {
+			printf("Going into %s\n", oid_to_hex(&(l->item->object.oid)));
+			int retval = refcount_dec_gc(l->item, PROCESS_PARENTS);
+			printf("Returning\n");
+			if (!ret)
+				ret = retval;
+		}
+		printf("Done with parents\n");
 	}
-	printf("Done with parents\n");
 
 	if (delete_object(&(cmt->object.oid)))
 		printf("Error when deleting commit in refcount_dec_gc\n");

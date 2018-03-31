@@ -1800,6 +1800,7 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 		rollback_index_files();
 		die("%s", err.buf);
 	}
+	ref_transaction_free(transaction);
 
 	// Lookup commit, init refcount for it and for objects in it's tree
 	struct object_id cid;
@@ -1809,8 +1810,6 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 			printf("Error initializing refcount for new commit\n");
 	} else
 		printf("Failure looking up commit in commit.c\n");
-
-	ref_transaction_free(transaction);
 
 	unlink(git_path_cherry_pick_head());
 	unlink(git_path_revert_head());
@@ -1838,6 +1837,12 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 	}
 	if (!quiet)
 		print_summary(prefix, &oid, !current_head);
+
+	// Decrease refcount of the amended commit
+	if (amend && current_head &&
+	    refcount_dec_gc(current_head, !PROCESS_PARENTS)) {
+		printf("Error decrementing refcount of amended commit\n");
+	}
 
 	UNLEAK(err);
 	UNLEAK(sb);
