@@ -52,7 +52,7 @@ int open_database(DB **dbpp) {
 			0);         /* File mode. Using defaults */
 
 	if (ret) {
-		dbp->err(dbp, ret, "Database '%s' open failed.", DB_name);
+		dbp->err(dbp, ret, "Database '%s' open failed", DB_name);
 		close_database(dbp);
 		return ret;
 	}
