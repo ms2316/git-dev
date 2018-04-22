@@ -94,11 +94,11 @@ int init_commit_refcount(struct commit *cmt) {
 	}
 
 	const char* tree_hash = oid_to_hex(&cmt->tree->object.oid);
+	if (get_ref_count(tree_hash) > 0)
+		return 0;
+
 	if (inc_ref_count(tree_hash))
 		printf("Error incrementing refcount of toptree %s\n", tree_hash);
-
-	if (get_ref_count(tree_hash) > 1)
-		return 0;
 
 	//At this point its clear that the tree is new
 	parse_pathspec(&pathspec, PATHSPEC_ALL_MAGIC &

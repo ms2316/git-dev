@@ -19,9 +19,9 @@ cat >expected <<'EOF'
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: 6fcdbdad90e504db3d90303aa3b51cc08b157f6c: key stored with value 1.
 db: aaff74984cccd156a469afa7d9ab10e4777beb24: key stored with value 1.
-db: aaff74984cccd156a469afa7d9ab10e4777beb24: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 1.
 [master (root-commit) 6fcdbda] single file
  Author: A U Thor <author@example.com>
@@ -31,9 +31,9 @@ DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: bdc293343e14e3139ad54be4103148211c3fffc4: key stored with value 1.
 db: dcb942478e894aaace77a6c2da89371bb017be37: key stored with value 1.
-db: dcb942478e894aaace77a6c2da89371bb017be37: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 2.
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key stored with value 1.
@@ -48,9 +48,9 @@ db: bdc293343e14e3139ad54be4103148211c3fffc4: key stored with value 2.
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: 4eb81ce8ca7c867d8631dcdafb5b325c800f989f: key stored with value 1.
 db: 0153c1977fc91ac6d43b80ba0df3e5618a22df79: key stored with value 1.
-db: 0153c1977fc91ac6d43b80ba0df3e5618a22df79: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 2.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 3.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key stored with value 1.
@@ -86,9 +86,9 @@ Switched to branch 'my_branch'
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: cc3aa628e96b9bd527f60c45d691b18e0af056f1: key stored with value 1.
 db: 47bf70748a31292989efe096f883f849a1b74c66: key stored with value 1.
-db: 47bf70748a31292989efe096f883f849a1b74c66: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 3.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 4.
 db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key stored with value 1.

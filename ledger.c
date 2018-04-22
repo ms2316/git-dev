@@ -116,7 +116,7 @@ const int get_ref_count(const char* _key) {
 				(char *)key.data, count );
 	} else {
 		dbp->err(dbp, ret, "DB->get");
-		count = -1;
+		count = 0;
 	}
 
 	close_database(dbp);

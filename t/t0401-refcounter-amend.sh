@@ -19,9 +19,9 @@ cat >expected <<'EOF'
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: 6fcdbdad90e504db3d90303aa3b51cc08b157f6c: key stored with value 1.
 db: aaff74984cccd156a469afa7d9ab10e4777beb24: key stored with value 1.
-db: aaff74984cccd156a469afa7d9ab10e4777beb24: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 1.
 [master (root-commit) 6fcdbda] single file
  Author: A U Thor <author@example.com>
@@ -32,9 +32,9 @@ db: 6fcdbdad90e504db3d90303aa3b51cc08b157f6c: key stored with value 2.
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: 6a7ac14bf42028ffb3491e41375e5fa48209b1ce: key stored with value 1.
 db: 3683f870be446c7cc05ffaef9fa06415276e1828: key stored with value 1.
-db: 3683f870be446c7cc05ffaef9fa06415276e1828: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 2.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key stored with value 1.
@@ -80,9 +80,9 @@ Deleted branch feat (was 6fcdbda).
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
+DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 db: 708c0a8e1c9c3b91037947484b2a96286592c01e: key stored with value 1.
 db: 04a59185a0c5f4047e4fd3fa87b0c84e671b00ee: key stored with value 1.
-db: 04a59185a0c5f4047e4fd3fa87b0c84e671b00ee: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 2.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key retrieved: data was 1.
