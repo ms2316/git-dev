@@ -22,8 +22,12 @@ int delete_obj(const char *hex) {
 	memcpy(path+13, hex, 2);
 	memcpy(path+15, "/", 1);
 	memcpy(path+16, hex + 2, 39);
-	printf("Commit_path: %s will be deleted\n", path);
-	return unlink(path);
+	printf("Object %s will be deleted\n", path);
+	int ret = unlink(path);
+	if (ret) {
+		// GLOB_COUNT++;
+	}
+	return ret;
 }
 
 int delete_object(struct object_id* oid) {

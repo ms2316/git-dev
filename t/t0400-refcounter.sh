@@ -112,11 +112,11 @@ db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 3.
 db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key retrieved: data was 1.
 db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key stored with value 0.
 db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key retrieved: data was 0.
-Commit_path: .git/objects/f2/ad6c76f0115a6ba5b00456a849810e7ec0af20 will be deleted
+Object .git/objects/f2/ad6c76f0115a6ba5b00456a849810e7ec0af20 will be deleted
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key retrieved: data was 3.
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key stored with value 2.
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key retrieved: data was 2.
-Commit_path: .git/objects/47/bf70748a31292989efe096f883f849a1b74c66 will be deleted
+Object .git/objects/47/bf70748a31292989efe096f883f849a1b74c66 will be deleted
 Starting processing parents
 Going into bdc293343e14e3139ad54be4103148211c3fffc4
 db: bdc293343e14e3139ad54be4103148211c3fffc4: key retrieved: data was 2.
@@ -124,7 +124,7 @@ db: bdc293343e14e3139ad54be4103148211c3fffc4: key stored with value 1.
 db: bdc293343e14e3139ad54be4103148211c3fffc4: key retrieved: data was 1.
 Returning
 Done with parents
-Commit_path: .git/objects/cc/3aa628e96b9bd527f60c45d691b18e0af056f1 will be deleted
+Object .git/objects/cc/3aa628e96b9bd527f60c45d691b18e0af056f1 will be deleted
 Deleted branch my_branch (was cc3aa62).
 * 4eb81ce Added b
 * bdc2933 Files a and files f/g

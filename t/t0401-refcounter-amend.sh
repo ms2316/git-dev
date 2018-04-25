@@ -72,10 +72,10 @@ db: aaff74984cccd156a469afa7d9ab10e4777beb24: key retrieved: data was 0.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 2.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 1.
-Commit_path: .git/objects/aa/ff74984cccd156a469afa7d9ab10e4777beb24 will be deleted
+Object .git/objects/aa/ff74984cccd156a469afa7d9ab10e4777beb24 will be deleted
 Starting processing parents
 Done with parents
-Commit_path: .git/objects/6f/cdbdad90e504db3d90303aa3b51cc08b157f6c will be deleted
+Object .git/objects/6f/cdbdad90e504db3d90303aa3b51cc08b157f6c will be deleted
 Deleted branch feat (was 6fcdbda).
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
@@ -107,8 +107,8 @@ db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 1.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key retrieved: data was 2.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key stored with value 1.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key retrieved: data was 1.
-Commit_path: .git/objects/36/83f870be446c7cc05ffaef9fa06415276e1828 will be deleted
-Commit_path: .git/objects/6a/7ac14bf42028ffb3491e41375e5fa48209b1ce will be deleted
+Object .git/objects/36/83f870be446c7cc05ffaef9fa06415276e1828 will be deleted
+Object .git/objects/6a/7ac14bf42028ffb3491e41375e5fa48209b1ce will be deleted
 * 708c0a8 ccc
 EOF
 test_expect_success 'amended commit must be deleted' '
