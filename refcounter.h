@@ -16,7 +16,7 @@ const char* get_hex_hash_by_bname(const char*);
  * Runs reference counting GC cascading deletions
  * Returns 0 on success and non-zero otherwise
  */
-int refcount_dec_gc(struct commit*, unsigned int);
+int refcount_gc(struct commit*, unsigned int);
 
 /*
  * Delete object spcified by object_id

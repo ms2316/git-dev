@@ -1840,7 +1840,7 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 
 	// Decrease refcount of the amended commit
 	if (amend && current_head &&
-	    refcount_dec_gc(current_head, !PROCESS_PARENTS)) {
+	    refcount_gc(current_head, !PROCESS_PARENTS)) {
 		printf("Error decrementing refcount of amended commit\n");
 	}
 

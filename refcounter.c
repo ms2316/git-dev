@@ -3,10 +3,13 @@
 #include "cache.h"
 #include "commit.h"
 #include "refcounter.h"
+#include "run-command.h"
 #include "ledger.h"
 #include "tree.h"
 #include "tree-walk.h"
 #include "pathspec.h"
+
+int packed_garbage = 0;
 
 const char* get_hex_hash_by_bname(const char* name) {
 	struct object_id oid;
@@ -23,11 +26,7 @@ int delete_obj(const char *hex) {
 	memcpy(path+15, "/", 1);
 	memcpy(path+16, hex + 2, 39);
 	printf("Object %s will be deleted\n", path);
-	int ret = unlink(path);
-	if (ret) {
-		// GLOB_COUNT++;
-	}
-	return ret;
+	return unlink(path);
 }
 
 int delete_object(struct object_id* oid) {
@@ -40,34 +39,6 @@ int delete_object_from_sha(const unsigned char* sha1) {
 	return delete_obj(hex);
 }
 
-int walk_tree_recursive(struct tree *tree) {
-	struct tree_desc desc;
-	struct name_entry entry;
-	struct object_id oid;
-
-	if (parse_tree(tree)) {
-		printf("Error parsing tree in walk_tree_recursive\n");
-		return -1;
-	}
-
-	init_tree_desc(&desc, tree->buffer, tree->size);
-
-	while (tree_entry(&desc, &entry)) {
-		// entry.oid entry.path entry.mode
-		printf("Entry path == %s\n", entry.path);
-		if (S_ISDIR(entry.mode)) {
-			oidcpy(&oid, entry.oid);
-		} else {
-			continue;
-		}
-
-		int retval = walk_tree_recursive(lookup_tree(&oid));
-		if (retval)
-			return -1;
-	}
-	return 0;
-}
-
 int tree_inc(const unsigned char *sha1, struct strbuf *base,
 	     const char *pathname, unsigned mode, int stage, void *context)
 {
@@ -75,7 +46,7 @@ int tree_inc(const unsigned char *sha1, struct strbuf *base,
 
 	if (inc_ref_count(hash)) {
 		printf("Error incrementing refcount of object with hash\
-			%s in tree_gc. Returning with -1\n", hash);
+			%s in tree_gc.\n", hash);
 		return -1;
 	}
 
@@ -134,8 +105,10 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 		return 0;
 
 	// At this point we know that hash is garbage
-	if (delete_object_from_sha(sha1))
+	if (delete_object_from_sha(sha1)) {
 		printf("Error deleting object in tree_gc\n");
+		packed_garbage++;
+	}
 
 	if (S_ISDIR(mode))
 		return READ_TREE_RECURSIVE;
@@ -180,8 +153,10 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 			printf("Error when reading_tree_recursive\n");
 		}
 
-		if (delete_object(&(cmt->tree->object.oid)))
+		if (delete_object(&(cmt->tree->object.oid))) {
 			printf("Error when deleting tree in refcount_dec_gc\n");
+			packed_garbage++;
+		}
 	}
 
 	if (traversal == PROCESS_PARENTS) {
@@ -196,8 +171,23 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 		printf("Done with parents\n");
 	}
 
-	if (delete_object(&(cmt->object.oid)))
+	if (delete_object(&(cmt->object.oid))) {
 		printf("Error when deleting commit in refcount_dec_gc\n");
+		packed_garbage++;
+	}
 
+	return ret;
+}
+
+int refcount_gc(struct commit* cmt, unsigned int traversal) {
+	int ret = refcount_dec_gc(cmt, traversal);
+	if (packed_garbage) {
+		printf("Running repack\n");
+		const char *args[] = {"repack", "-Ad", NULL};
+		if (run_command_v_opt(args, RUN_GIT_CMD))
+			printf("Error running repack after refcount_gc\n");
+
+		packed_garbage = 0;
+	}
 	return ret;
 }

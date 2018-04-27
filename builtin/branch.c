@@ -277,7 +277,7 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 		}
 
 		// Run refcounting GC on the remembered commit
-		if (cmt && refcount_dec_gc(cmt, PROCESS_PARENTS))
+		if (cmt && refcount_gc(cmt, PROCESS_PARENTS))
 			printf("Refcounting GC exited with error\n");
 
 		if (!quiet) {
