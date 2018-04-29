@@ -3,7 +3,7 @@
 #include "ledger.h"
 
 //Default ledger DB name
-const char* DB_name = "ledger";
+const char* DB_name = ".git/ledger";
 
 /*
  * Close DB

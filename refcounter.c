@@ -95,7 +95,6 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 	    const char *pathname, unsigned mode, int stage, void *context)
 {
 	const char *hash = sha1_to_hex(sha1);
-
 	if (dec_ref_count(hash)) {
 		printf("Error decrementing refcount of object with hash\
 			%s in tree_gc\n", hash);
@@ -118,14 +117,16 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 
 int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 	int ret = 0;
+
 	if (!cmt->object.parsed)
 		parse_commit_or_die(cmt);
 
 	const char* cmt_hash = oid_to_hex(&(cmt->object.oid));
-
-	if (dec_ref_count(cmt_hash))
+	if (dec_ref_count(cmt_hash)) {
 		printf("Error decrementing refcount of commit\
 			%s in refcount_gc\n", cmt_hash);
+	}
+
 	if (!is_garbage(cmt_hash))
 		return 0;
 
