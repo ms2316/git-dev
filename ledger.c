@@ -1,8 +1,12 @@
 // LEDGER_C
 
 #include "ledger.h"
+#include <db.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-//Default ledger DB name
+//Ledger DB name
 const char* DB_name = ".git/ledger";
 
 /*
@@ -12,7 +16,7 @@ const char* DB_name = ".git/ledger";
 int close_database(DB *dbp) {
 	int ret;
 
-	if (dbp && ((ret = dbp->close(dbp, 0)) != 0)) {
+	if (dbp && (ret = dbp->close(dbp, 0))) {
 		fprintf(stderr, "Database close failed: %s\n", db_strerror(ret));
 		return ret;
 	}
@@ -69,7 +73,7 @@ int add_to_db_overwriting(const char* _key, int count) {
 	DBT key, data;
 	int ret;
 
-	if ((ret = open_database(&dbp)) != 0) {
+	if ((ret = open_database(&dbp))) {
 		return ret;
 	}
 
@@ -81,10 +85,10 @@ int add_to_db_overwriting(const char* _key, int count) {
 	data.data = &count;
 	data.size = sizeof(int);
 
-	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)) == 0)
-		printf("db: %s: key stored with value %d.\n", (char *)key.data, count);
-	else {
+	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)))
 		dbp->err(dbp, ret, "DB->put");
+	else {
+		printf("db: %s: key stored with value %d.\n", (char *)key.data, count);
 	}
 
 	close_database(dbp);
@@ -97,8 +101,8 @@ const int get_ref_count(const char* _key) {
 	int ret;
 	int count = -1;
 
-	if ((ret = open_database(&dbp)) != 0) {
-		return -1;
+	if ((ret = open_database(&dbp))) {
+		return ret;
 	}
 
 	memset(&key, 0, sizeof(key));
@@ -109,14 +113,13 @@ const int get_ref_count(const char* _key) {
 	data.data = &count;
 	data.size = sizeof(int);
 
-	if ((ret = dbp->get(dbp, NULL, &key, &data, 0)) == 0) {
-		int *tmp = (int*)data.data;
-		count = *tmp;
+	if ((ret = dbp->get(dbp, NULL, &key, &data, 0))) {
+		dbp->err(dbp, ret, "DB->get");
+		count = -1;
+	} else {
+		count = *((int*)data.data);
 		printf("db: %s: key retrieved: data was %d.\n",
 				(char *)key.data, count );
-	} else {
-		dbp->err(dbp, ret, "DB->get");
-		count = 0;
 	}
 
 	close_database(dbp);
@@ -130,8 +133,10 @@ int is_garbage(const char* _key) {
 int inc_ref_count(const char* _key) {
 
 	int count = get_ref_count(_key);
+
 	// check if the key exists at all
-	if (count < 0) count = 0;
+	if (count < 0)
+		count = 0;
 
 	return add_to_db_overwriting(_key, count + 1);
 }
@@ -141,13 +146,14 @@ int dec_ref_count(const char* _key) {
 	int count = get_ref_count(_key);
 
 	if (count == 0) {
-		printf("Semantic Error: The refcount is already zero and can't\
-			be negative\n");
+		fprintf(stderr, "Semantic Error: The refcount is already zero\
+				 and can't be negative\n");
 		return -1;
 	}
+
 	if (count < 0) {
-		printf("Semantic Error: Trying to decrement refcount\
-			of a key not in DB\n");
+		fprintf(stderr, "Semantic Error: Trying to decrement refcount\
+				 of a key not in DB\n");
 		return -1;
 	}
 
