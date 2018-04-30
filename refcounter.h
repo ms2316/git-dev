@@ -1,6 +1,8 @@
 #ifndef REFCOUNTER_H
 #define REFCOUNTER_H
 
+#include "cache.h"
+#include "commit.h"
 #include "pathspec.h"
 
 #define PROCESS_PARENTS 1
@@ -17,18 +19,6 @@ const char* get_hex_hash_by_bname(const char*);
  * Returns 0 on success and non-zero otherwise
  */
 int refcount_gc(struct commit*, unsigned int);
-
-/*
- * Delete object spcified by object_id
- * Returns 0 on success and non-zero otherwise
- */
-int delete_object(struct object_id*);
-
-/*
- * Delete object spcified by sha1
- * Returns 0 on success and non-zero otherwise
- */
-int delete_object_from_sha(const unsigned char*);
 
 /*
  * Initialize reference count of the new commit
