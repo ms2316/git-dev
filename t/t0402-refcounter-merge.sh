@@ -78,6 +78,12 @@ db: 61780798228d17af2d34fce4cfbdf35556832472: key retrieved: data was 1.
 db: 61780798228d17af2d34fce4cfbdf35556832472: key stored with value 2.
 db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key retrieved: data was 1.
 db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key stored with value 2.
+db: d8c604cd38369cb7015c8570a75ba999c22e9a8d: key retrieved: data was 1.
+db: d8c604cd38369cb7015c8570a75ba999c22e9a8d: key stored with value 2.
+db: d8c604cd38369cb7015c8570a75ba999c22e9a8d: key retrieved: data was 2.
+db: d8c604cd38369cb7015c8570a75ba999c22e9a8d: key stored with value 1.
+db: d8c604cd38369cb7015c8570a75ba999c22e9a8d: key retrieved: data was 1.
+Deleted branch feat (was d8c604c).
 *   b832b65 Merge branch 'feat'
 |\  
 | * d8c604c Added c
@@ -99,6 +105,7 @@ test_expect_success 'merge has to be done' '
 	git commit -m "Added c" 2>&1 | tee -a actual &&
 	git checkout master 2>&1 | tee -a actual &&
 	git merge feat 2>&1 | tee -a actual &&
+	git branch -d feat 2>%1 | tee -a actual &&
 	git log --graph --oneline --all 2>&1 | tee -a actual &&
 	test_cmp expected actual
 '
@@ -178,6 +185,10 @@ db: e14516d75b1dc9720c34673ddbdf22c35fd9af8f: key retrieved: data was 1.
 db: e14516d75b1dc9720c34673ddbdf22c35fd9af8f: key stored with value 2.
 db: 5538c3833cb860d059b2dd4f7529ecdf156a25f0: key retrieved: data was 2.
 db: 5538c3833cb860d059b2dd4f7529ecdf156a25f0: key stored with value 1.
+db: e14516d75b1dc9720c34673ddbdf22c35fd9af8f: key retrieved: data was 2.
+db: e14516d75b1dc9720c34673ddbdf22c35fd9af8f: key stored with value 1.
+db: e14516d75b1dc9720c34673ddbdf22c35fd9af8f: key retrieved: data was 1.
+Deleted branch br (was e14516d).
 * e14516d Added g
 * 5cd28d6 Added f
 * 5538c38 Add e
@@ -201,9 +212,9 @@ test_expect_success 'most common case of merging one remote' '
 	git add g &&
 	git commit -m "Added g" 2>&1 | tee -a actual &&
 	git checkout master 2>&1 | tee -a actual &&
-	git merge br  2>&1 | tee -a actual &&
+	git merge br 2>&1 | tee -a actual &&
+	git branch -d br 2>&1 | tee -a actual &&
 	git log --graph --oneline --all 2>&1 | tee -a actual &&
 	test_cmp expected actual
 '
-
 test_done

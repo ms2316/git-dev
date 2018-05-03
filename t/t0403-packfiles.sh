@@ -49,19 +49,49 @@ DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
 DB->get: BDB0073 DB_NOTFOUND: No matching key/data pair found
-db: 4eb81ce8ca7c867d8631dcdafb5b325c800f989f: key stored with value 1.
-db: 0153c1977fc91ac6d43b80ba0df3e5618a22df79: key stored with value 1.
+db: ce9cb5d6a5e7a3eac0b049ff026990e6ac056cb7: key stored with value 1.
+db: 60cc63998fff9e04143609b3258f4999b607b831: key stored with value 1.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 2.
 db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 3.
-db: 61780798228d17af2d34fce4cfbdf35556832472: key stored with value 1.
+db: 575742d9762525faedf57a496a793ab39cbe58a7: key stored with value 1.
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key retrieved: data was 1.
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key stored with value 2.
 db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key retrieved: data was 2.
-[master 4eb81ce] Added b
+[my_branch ce9cb5d] Added b
  Author: A U Thor <author@example.com>
  1 file changed, 1 insertion(+)
  create mode 100644 b
-* 4eb81ce Added b
+db: ce9cb5d6a5e7a3eac0b049ff026990e6ac056cb7: key retrieved: data was 1.
+db: ce9cb5d6a5e7a3eac0b049ff026990e6ac056cb7: key stored with value 0.
+db: ce9cb5d6a5e7a3eac0b049ff026990e6ac056cb7: key retrieved: data was 0.
+db: 60cc63998fff9e04143609b3258f4999b607b831: key retrieved: data was 1.
+db: 60cc63998fff9e04143609b3258f4999b607b831: key stored with value 0.
+db: 60cc63998fff9e04143609b3258f4999b607b831: key retrieved: data was 0.
+db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 3.
+db: 78981922613b2afb6025042ff6bd878ac1994e85: key stored with value 2.
+db: 78981922613b2afb6025042ff6bd878ac1994e85: key retrieved: data was 2.
+db: 575742d9762525faedf57a496a793ab39cbe58a7: key retrieved: data was 1.
+db: 575742d9762525faedf57a496a793ab39cbe58a7: key stored with value 0.
+db: 575742d9762525faedf57a496a793ab39cbe58a7: key retrieved: data was 0.
+Object .git/objects/57/5742d9762525faedf57a496a793ab39cbe58a7 will be deleted
+Error deleting object in tree_gc
+db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key retrieved: data was 2.
+db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key stored with value 1.
+db: 723e98345297d8490a430e1573ec8a5a8a31e7aa: key retrieved: data was 1.
+Object .git/objects/60/cc63998fff9e04143609b3258f4999b607b831 will be deleted
+Error when deleting tree in refcount_dec_gc
+Starting processing parents
+Going into bdc293343e14e3139ad54be4103148211c3fffc4
+db: bdc293343e14e3139ad54be4103148211c3fffc4: key retrieved: data was 2.
+db: bdc293343e14e3139ad54be4103148211c3fffc4: key stored with value 1.
+db: bdc293343e14e3139ad54be4103148211c3fffc4: key retrieved: data was 1.
+Returning
+Done with parents
+Object .git/objects/ce/9cb5d6a5e7a3eac0b049ff026990e6ac056cb7 will be deleted
+Error when deleting commit in refcount_dec_gc
+Running repack
+Deleted branch my_branch (was ce9cb5d).
+2905	.git/objects/
 * bdc2933 Files a and files f/g
 * 6fcdbda single file
 EOF
@@ -81,7 +111,7 @@ test_expect_success 'testing commit' '
 	git checkout master &&
 	git gc &&
 	git branch -D my_branch 2>&1 | tee -a actual &&
-	gdu -b .git/objects/pack &&
+	gdu -bs .git/objects/ | tee -a actual &&
 	git log --graph --oneline --all 2>&1 | tee -a actual &&
 	test_cmp expected actual
 '
