@@ -806,7 +806,12 @@ static int merge_trivial(struct commit *head, struct commit_list *remoteheads)
 {
 	struct object_id result_tree, result_commit;
 	struct commit_list *parents, **pptr = &parents;
+	struct commit_list *merged = NULL;
 	static struct lock_file lock;
+
+	// Save about to be merged heads for reference counting
+	for (struct commit_list *l = remoteheads; l; l = l->next)
+		commit_list_insert(l->item, &merged);
 
 	hold_locked_index(&lock, LOCK_DIE_ON_ERROR);
 	refresh_cache(REFRESH_QUIET);
@@ -829,8 +834,18 @@ static int merge_trivial(struct commit *head, struct commit_list *remoteheads)
 	struct commit* cmt;
 	if (!(cmt = lookup_commit_reference(&result_commit)) ||
 			init_commit_refcount(cmt)) {
-		printf("Failure initializing commit in merge/merge_trivial\n");
+		fprintf(stderr, "Failure initializing commit\
+				 in merge/merge_trivial\n");
 	}
+
+	// Increment refcount of merged remotes
+	for (struct commit_list *l = merged; l; l = l->next) {
+		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
+			fprintf(stderr, "Error incrementing refcount of remote\
+					 commit after merge\n");
+		}
+	}
+
 	drop_save();
 	return 0;
 }
@@ -843,8 +858,13 @@ static int finish_automerge(struct commit *head,
 			    const char *wt_strategy)
 {
 	struct commit_list *parents = NULL;
+	struct commit_list *merged = NULL;
 	struct strbuf buf = STRBUF_INIT;
 	struct object_id result_commit;
+
+	// Save about to be merged heads for reference counting
+	for (struct commit_list *l = remoteheads; l; l = l->next)
+		commit_list_insert(l->item, &merged);
 
 	free_commit_list(common);
 	parents = remoteheads;
@@ -863,8 +883,18 @@ static int finish_automerge(struct commit *head,
 	struct commit* cmt;
 	if (!(cmt = lookup_commit_reference(&result_commit)) ||
 			init_commit_refcount(cmt)) {
-		printf("Failure initializing commit in merge/finish_automerge\n");
+		fprintf(stderr, "Failure initializing commit in\
+				finish_automerge\n");
 	}
+
+	// Increment refcount of merged commits
+	for (struct commit_list *l = merged; l; l = l->next) {
+		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
+			fprintf(stderr, "Error incrementing refcount of remote\
+					 commit after merge\n");
+		}
+	}
+
 	drop_save();
 	return 0;
 }
