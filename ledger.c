@@ -95,7 +95,7 @@ int add_to_db_overwriting(const char* _key, int count) {
 	return ret;
 }
 
-const int get_ref_count(const char* _key) {
+int get_ref_count(const char* _key) {
 	DB *dbp;
 	DBT key, data;
 	int ret;

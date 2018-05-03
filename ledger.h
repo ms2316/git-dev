@@ -5,7 +5,7 @@
  * Returns number of references of an object with given key.
  * -1 is returned if the key DNE or in case of DB related issues.
  */
-const int get_ref_count(const char* _key);
+int get_ref_count(const char* _key);
 
 /*
  * Returns 1 if ref count of an object with given key is zero, 0 otherwise.

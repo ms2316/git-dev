@@ -60,7 +60,10 @@ int init_commit_refcount(struct commit *cmt) {
 	if (!cmt->object.parsed)
 		parse_commit_or_die(cmt);
 
-	inc_ref_count(oid_to_hex(&(cmt->object.oid)));
+	if (inc_ref_count(oid_to_hex(&(cmt->object.oid)))) {
+		fprintf(stderr, "Error incrementing refcount\
+				 of commit object in tree_gc.\n");
+	}
 
 	if (!cmt->tree->object.parsed) {
 		if (parse_tree(cmt->tree))
