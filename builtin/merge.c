@@ -1236,8 +1236,7 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 		if (!file_exists(git_path_merge_head()))
 			die(_("There is no merge in progress (MERGE_HEAD missing)."));
 
-		// Invoke 'git commit'
-		// Reference count is handled automatically by cmd_commit
+		/* Invoke 'git commit' */
 		ret = cmd_commit(nargc, nargv, prefix);
 		goto done;
 	}
@@ -1403,7 +1402,6 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 		free(list);
 	}
 
-	// Creating new branch(temporary) to point at head_commit
 	update_ref("updating ORIG_HEAD", "ORIG_HEAD",
 		   &head_commit->object.oid, NULL, 0, UPDATE_REFS_DIE_ON_ERR);
 

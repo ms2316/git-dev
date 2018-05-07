@@ -320,10 +320,13 @@ void create_branch(const char *name, const char *start_name,
 		setup_tracking(ref.buf + 11, real_ref, track, quiet);
 
 	const char* cmt_hash;
-	if ((cmt_hash = get_hex_hash_by_bname(start_name)))
-		inc_ref_count(cmt_hash);
-	else
+	if ((cmt_hash = get_hex_hash_by_bname(start_name))) {
+		if (inc_ref_count(cmt_hash))
+			fprintf(stderr, "Error incrementing refcount of\
+					 a commit after branch creation\n");
+	} else {
 		fprintf(stderr, "Cant get commit hash when creating branch\n");
+	}
 
 	strbuf_release(&ref);
 	free(real_ref);
