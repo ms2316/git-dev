@@ -264,7 +264,7 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 		struct commit* cmt;
 		if (get_oid(bname.buf, &cid) ||
 		    !(cmt = lookup_commit_reference(&cid)))
-			printf("Failure getting commit in builtin/branch.c\n");
+			fprintf(stderr, "Can't get commit before branch deletion\n");
 
 		if (delete_ref(NULL, name, is_null_oid(&oid) ? NULL : &oid,
 			       REF_NODEREF)) {
@@ -278,7 +278,7 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 
 		// Run refcounting GC on the remembered commit
 		if (cmt && refcount_gc(cmt, PROCESS_PARENTS))
-			printf("Refcounting GC exited with error\n");
+			fprintf(stderr, "Refcounting GC exited with error\n");
 
 		if (!quiet) {
 			printf(remote_branch

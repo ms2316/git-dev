@@ -57,7 +57,6 @@ db: f2ad6c76f0115a6ba5b00456a849810e7ec0af20: key stored with value 1.
  1 file changed, 1 insertion(+)
  create mode 100644 c
 Switched to branch 'master'
-DEBUG: We are in cmd_merge!
 Merging:
 69535ad Added b
 virtual feat
@@ -172,8 +171,6 @@ db: 01058d844a98d293a3b03a8615a34700e4ed2be3: key stored with value 1.
  1 file changed, 1 insertion(+)
  create mode 100644 g
 Switched to branch 'master'
-DEBUG: We are in cmd_merge!
-DEBUG: the most common case of merging one remote
 Updating 5538c38..e14516d
 Fast-forward
  f | 1 +

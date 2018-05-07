@@ -1802,14 +1802,14 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 	}
 	ref_transaction_free(transaction);
 
-	// Lookup commit, init refcount for it and for objects in it's tree
+	// Lookup commit and initialize its reference count
 	struct object_id cid;
 	struct commit* cmt;
 	if (!get_oid("HEAD", &cid) && (cmt = lookup_commit_reference(&cid))) {
 		if (init_commit_refcount(cmt))
-			printf("Error initializing refcount for new commit\n");
+			fprintf(stderr, "Error initializing refcount of a commit\n");
 	} else
-		printf("Failure looking up commit in commit.c\n");
+		fprintf(stderr, "Failure looking up commit in commit.c\n");
 
 	unlink(git_path_cherry_pick_head());
 	unlink(git_path_revert_head());
@@ -1841,7 +1841,7 @@ int cmd_commit(int argc, const char **argv, const char *prefix)
 	// Decrease refcount of the amended commit
 	if (amend && current_head &&
 	    refcount_gc(current_head, !PROCESS_PARENTS)) {
-		printf("Error decrementing refcount of amended commit\n");
+		fprintf(stderr, "Error decrementing refcount of amended commit\n");
 	}
 
 	UNLEAK(err);

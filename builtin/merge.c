@@ -1181,8 +1181,6 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 	void *branch_to_free;
 	int orig_argc = argc;
 
-	printf("DEBUG: We are in cmd_merge!\n");
-
 	if (argc == 2 && !strcmp(argv[1], "-h"))
 		usage_with_options(builtin_merge_usage, builtin_merge_options);
 
@@ -1290,7 +1288,6 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 			builtin_merge_options);
 
 	if (!head_commit) {
-		printf("DEBUG: Head commit is NULL\n");
 		/*
 		 * If the merged head is a valid one there is no reason
 		 * to forbid "git merge" into a branch yet to be born.
@@ -1312,8 +1309,6 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 		read_empty(remote_head_oid->hash, 0);
 		update_ref("initial pull", "HEAD", remote_head_oid, NULL, 0,
 			   UPDATE_REFS_DIE_ON_ERR);
-		// Do we need to update refcount here? Because we only update HEAD
-		// Current implementation of refcount gc doesnt track HEAD refcount
 		goto done;
 	}
 
@@ -1431,7 +1426,6 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 			!oidcmp(&common->item->object.oid, &head_commit->object.oid)) {
 		/* Again the most common case of merging one remote. */
 
-		printf("DEBUG: the most common case of merging one remote\n");
 		struct strbuf msg = STRBUF_INIT;
 		struct commit *commit;
 
@@ -1464,12 +1458,12 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 		// After fast forward merge increment refcount of new head
 		// and decrement refcount of head_commit
 		if (inc_ref_count(oid_to_hex(&commit->object.oid))) {
-			printf("Error incrementing refcount of commit\
-				in the most common merge\n");
+			fprintf(stderr, "Error incrementing refcount of commit\
+					 in the most common merge\n");
 		}
 		if (dec_ref_count(oid_to_hex(&head_commit->object.oid))) {
-			printf("Error decrementing refcount of commit\
-				in the most common merge\n");
+			fprintf(stderr, "Error decrementing refcount of commit\
+					 in the most common merge\n");
 		}
 		goto done;
 	} else if (!remoteheads->next && common->next)

@@ -323,7 +323,7 @@ void create_branch(const char *name, const char *start_name,
 	if ((cmt_hash = get_hex_hash_by_bname(start_name)))
 		inc_ref_count(cmt_hash);
 	else
-		printf("Couldn't get commit hash in branch.c/create_branch\n");
+		fprintf(stderr, "Cant get commit hash when creating branch\n");
 
 	strbuf_release(&ref);
 	free(real_ref);
