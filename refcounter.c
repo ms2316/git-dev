@@ -6,8 +6,11 @@
 #include "ledger.h"
 #include "pathspec.h"
 #include "run-command.h"
+#include "strbuf.h"
 #include "tree.h"
 #include "tree-walk.h"
+
+#define PATHLEN 55
 
 int packed_garbage = 0;
 
@@ -19,14 +22,20 @@ const char* get_hex_hash_by_bname(const char* name) {
 }
 
 int delete_object(const char *hex) {
-	size_t sz = 13 + 2 + 1 + 38 + 1;
-	char path[sz];
-	memcpy(path, ".git/objects/", 13);
-	memcpy(path+13, hex, 2);
-	memcpy(path+15, "/", 1);
-	memcpy(path+16, hex + 2, 39);
-	printf("Object %s will be deleted\n", path);
-	return unlink(path);
+	// construct object path
+	struct strbuf sb = STRBUF_INIT;
+	strbuf_grow(&sb, PATHLEN);
+	strbuf_addstr(&sb, ".git/objects/");
+	strbuf_add(&sb, hex, 2); // first 2 chars define dir name
+	strbuf_addch(&sb, '/'); // dir-file separator
+	strbuf_addstr(&sb, hex + 2); //the rest 38 define file name
+
+	// Remove object
+	printf("Object %s will be deleted\n", sb.buf);
+	int ret = unlink(sb.buf);
+	strbuf_release(&sb);
+
+	return ret;
 }
 
 int delete_object_by_id(struct object_id* oid) {
@@ -45,8 +54,8 @@ int tree_inc(const unsigned char *sha1, struct strbuf *base,
 	const char *hash = sha1_to_hex(sha1);
 
 	if (inc_ref_count(hash)) {
-		fprintf(stderr, "Error incrementing refcount of object\
-				 with hash %s in tree_gc.\n", hash);
+		fprintf(stderr, "Error incrementing refcount of object "
+			"with hash %s during commit initialization.\n", hash);
 		return -1;
 	}
 
@@ -61,22 +70,27 @@ int init_commit_refcount(struct commit *cmt) {
 		parse_commit_or_die(cmt);
 
 	if (inc_ref_count(oid_to_hex(&(cmt->object.oid)))) {
-		fprintf(stderr, "Error incrementing refcount\
-				 of commit object in tree_gc.\n");
+		fprintf(stderr, "Error incrementing refcount "
+			"of commit object when initializing commit\n");
+		return -1;
 	}
 
 	if (!cmt->tree->object.parsed) {
-		if (parse_tree(cmt->tree))
+		if (parse_tree(cmt->tree)) {
 			fprintf(stderr, "Error parsing tree\n");
+			return -1;
+		}
 	}
 
 	const char* tree_hash = oid_to_hex(&cmt->tree->object.oid);
 	if (get_ref_count(tree_hash) > 0)
 		return 0;
 
-	if (inc_ref_count(tree_hash))
-		fprintf(stderr, "Error incrementing refcount\
-				 of toplevel tree %s\n", tree_hash);
+	if (inc_ref_count(tree_hash)) {
+		fprintf(stderr, "Error incrementing refcount "
+			"of toplevel tree while initializing commit.\n");
+		return -1;
+	}
 
 	//At this point its clear that the tree is new
 	parse_pathspec(&pathspec, PATHSPEC_ALL_MAGIC &
@@ -89,6 +103,7 @@ int init_commit_refcount(struct commit *cmt) {
 	if (read_tree_recursive(cmt->tree, "", 0, 0, &pathspec,
 				  tree_inc, NULL)) {
 		fprintf(stderr, "Error when reading tree recursively\n");
+		return -1;
 	}
 
 	return 0;
@@ -99,8 +114,9 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 {
 	const char *hash = sha1_to_hex(sha1);
 	if (dec_ref_count(hash)) {
-		fprintf(stderr, "Error decrementing refcount of object\
-				 with hash %s during refcount GC\n", hash);
+		fprintf(stderr, "Error decrementing refcount of object "
+			"with hash %s during reference counting GC.\n", hash);
+		return -1;
 	}
 
 	if (!is_garbage(hash))
@@ -119,15 +135,14 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 }
 
 int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
-	int ret = 0;
-
 	if (!cmt->object.parsed)
 		parse_commit_or_die(cmt);
 
 	const char* cmt_hash = oid_to_hex(&(cmt->object.oid));
 	if (dec_ref_count(cmt_hash)) {
-		fprintf(stderr, "Error decrementing refcount of commit\
-				 %s in refcount_gc\n", cmt_hash);
+		fprintf(stderr, "Error decrementing refcount of commit "
+			"%s during reference counting GC\n", cmt_hash);
+		return -1;
 	}
 
 	if (!is_garbage(cmt_hash))
@@ -135,15 +150,20 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 
 	// first work with tree
 	if (!cmt->tree->object.parsed) {
-		if (parse_tree(cmt->tree))
+		if (parse_tree(cmt->tree)) {
 			fprintf(stderr, "Error parsing tree\n");
+			return -1;
+		}
 	}
 
 	const char* tree_hash = oid_to_hex(&(cmt->tree->object.oid));
 
-	if (dec_ref_count(tree_hash))
-		fprintf(stderr, "Error decrementing refcount of tree\
-				 %s in refcount_gc\n", tree_hash);
+	if (dec_ref_count(tree_hash)) {
+		fprintf(stderr, "Error decrementing refcount of tree "
+			"%s during reference counting GC.\n", tree_hash);
+		return -1;
+	}
+
 	if (is_garbage(tree_hash)) {
 		parse_pathspec(&pathspec, PATHSPEC_ALL_MAGIC &
 					  ~(PATHSPEC_FROMTOP | PATHSPEC_LITERAL),
@@ -155,6 +175,7 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 		if (read_tree_recursive(cmt->tree, "", 0, 0, &pathspec,
 					  tree_gc, NULL)) {
 			fprintf(stderr, "Error when reading tree recursively\n");
+			return -1;
 		}
 
 		if (delete_object_by_id(&(cmt->tree->object.oid))) {
@@ -167,10 +188,10 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 		printf("Starting processing parents\n");
 		for (struct commit_list *l = cmt->parents; l; l = l->next) {
 			printf("Going into %s\n", oid_to_hex(&(l->item->object.oid)));
-			int retval = refcount_dec_gc(l->item, PROCESS_PARENTS);
+			if (refcount_dec_gc(l->item, PROCESS_PARENTS)) {
+				return -1;
+			}
 			printf("Returning\n");
-			if (!ret)
-				ret = retval;
 		}
 		printf("Done with parents\n");
 	}
@@ -180,7 +201,7 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 		packed_garbage++;
 	}
 
-	return ret;
+	return 0;
 }
 
 int refcount_gc(struct commit* cmt, unsigned int traversal) {
