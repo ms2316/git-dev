@@ -802,16 +802,34 @@ static void prepare_to_commit(struct commit_list *remoteheads)
 	strbuf_release(&msg);
 }
 
+int merge_refcount_update(struct object_id *result_commit,
+		struct commit_list *merged)
+{
+	// Initialize the refcount of a created commit
+	struct commit* cmt;
+	if (!(cmt = lookup_commit_reference(result_commit)) ||
+			init_commit_refcount(cmt)) {
+		return -1;
+	}
+
+	// Increment refcount of merged commits
+	for (struct commit_list *l = merged; l; l = l->next) {
+		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
 static int merge_trivial(struct commit *head, struct commit_list *remoteheads)
 {
 	struct object_id result_tree, result_commit;
 	struct commit_list *parents, **pptr = &parents;
-	struct commit_list *merged = NULL;
 	static struct lock_file lock;
 
 	// Save about to be merged heads for reference counting
-	for (struct commit_list *l = remoteheads; l; l = l->next)
-		commit_list_insert(l->item, &merged);
+	struct commit_list *merged = copy_commit_list(remoteheads);
 
 	hold_locked_index(&lock, LOCK_DIE_ON_ERROR);
 	refresh_cache(REFRESH_QUIET);
@@ -830,20 +848,9 @@ static int merge_trivial(struct commit *head, struct commit_list *remoteheads)
 		die(_("failed to write commit object"));
 	finish(head, remoteheads, &result_commit, "In-index merge");
 
-	// Initialize the reference count of a created commit
-	struct commit* cmt;
-	if (!(cmt = lookup_commit_reference(&result_commit)) ||
-			init_commit_refcount(cmt)) {
-		fprintf(stderr, "Failure initializing reference count "
-			"of a commit after a trivial merge\n");
-	}
-
-	// Increment reference count of merged remotes
-	for (struct commit_list *l = merged; l; l = l->next) {
-		if (inc_ref_count(oid_to_hex(&(l->item->object.oid))))
-			fprintf(stderr, "Error incrementing reference count "
-				"of a remote commit after trivial merge\n");
-	}
+	if (merge_refcount_update(&result_commit, merged))
+		fprintf(stderr, "Failure updating reference count after "
+			"a trivial merge.\n");
 
 	drop_save();
 	return 0;
@@ -857,13 +864,11 @@ static int finish_automerge(struct commit *head,
 			    const char *wt_strategy)
 {
 	struct commit_list *parents = NULL;
-	struct commit_list *merged = NULL;
 	struct strbuf buf = STRBUF_INIT;
 	struct object_id result_commit;
 
 	// Save about to be merged heads for reference counting
-	for (struct commit_list *l = remoteheads; l; l = l->next)
-		commit_list_insert(l->item, &merged);
+	struct commit_list *merged = copy_commit_list(remoteheads);
 
 	free_commit_list(common);
 	parents = remoteheads;
@@ -878,21 +883,8 @@ static int finish_automerge(struct commit *head,
 	finish(head, remoteheads, &result_commit, buf.buf);
 	strbuf_release(&buf);
 
-	// Initialize the refcount of a freshly created commit
-	struct commit* cmt;
-	if (!(cmt = lookup_commit_reference(&result_commit)) ||
-			init_commit_refcount(cmt)) {
-		fprintf(stderr, "Failure initializing reference count "
-			"of a commit after automerge\n");
-	}
-
-	// Increment refcount of merged commits
-	for (struct commit_list *l = merged; l; l = l->next) {
-		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
-			fprintf(stderr, "Error incrementing reference count "
-				"of a remote commit after automerge\n");
-		}
-	}
+	if (merge_refcount_update(&result_commit, merged))
+		fprintf(stderr, "Failure updating refcount after automerge.\n");
 
 	drop_save();
 	return 0;
