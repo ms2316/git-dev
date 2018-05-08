@@ -319,6 +319,8 @@ void create_branch(const char *name, const char *start_name,
 	if (real_ref && track)
 		setup_tracking(ref.buf + 11, real_ref, track, quiet);
 
+	// Increment reference count of the commit
+	// that is referenced by the created branch
 	const char* cmt_hash;
 	if ((cmt_hash = get_hex_hash_by_bname(start_name))) {
 		if (inc_ref_count(cmt_hash))

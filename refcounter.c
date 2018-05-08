@@ -12,6 +12,7 @@
 
 #define PATHLEN 55
 
+// Garbage counter
 int packed_garbage = 0;
 
 const char* get_hex_hash_by_bname(const char* name) {
@@ -92,7 +93,6 @@ int init_commit_refcount(struct commit *cmt) {
 		return -1;
 	}
 
-	//At this point its clear that the tree is new
 	parse_pathspec(&pathspec, PATHSPEC_ALL_MAGIC &
 				  ~(PATHSPEC_FROMTOP | PATHSPEC_LITERAL),
 		       PATHSPEC_PREFER_CWD,
@@ -122,7 +122,6 @@ int tree_gc(const unsigned char *sha1, struct strbuf *base,
 	if (!is_garbage(hash))
 		return 0;
 
-	// At this point we know that hash is garbage
 	if (delete_object_by_sha(sha1)) {
 		printf("Error deleting object in tree_gc\n");
 		packed_garbage++;
@@ -148,7 +147,6 @@ int refcount_dec_gc(struct commit* cmt, unsigned int traversal) {
 	if (!is_garbage(cmt_hash))
 		return 0;
 
-	// first work with tree
 	if (!cmt->tree->object.parsed) {
 		if (parse_tree(cmt->tree)) {
 			fprintf(stderr, "Error parsing tree\n");

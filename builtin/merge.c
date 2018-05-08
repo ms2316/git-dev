@@ -805,7 +805,7 @@ static void prepare_to_commit(struct commit_list *remoteheads)
 int merge_refcount_update(struct object_id *result_commit,
 		struct commit_list *merged)
 {
-	// Initialize the refcount of a created commit
+	// Initialize the refcount of the created commit
 	struct commit* cmt;
 	if (!(cmt = lookup_commit_reference(result_commit)) ||
 			init_commit_refcount(cmt)) {
@@ -814,9 +814,8 @@ int merge_refcount_update(struct object_id *result_commit,
 
 	// Increment refcount of merged commits
 	for (struct commit_list *l = merged; l; l = l->next) {
-		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
+		if (inc_ref_count(oid_to_hex(&(l->item->object.oid))))
 			return -1;
-		}
 	}
 
 	return 0;

@@ -259,7 +259,8 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			goto next;
 		}
 
-		// Remember commit referenced by the branch to be deleted
+		// Remember commit that is referenced by the branch
+		// which is about to be deleted
 		struct object_id cid;
 		struct commit* cmt;
 		if (get_oid(bname.buf, &cid) ||
