@@ -322,10 +322,10 @@ void create_branch(const char *name, const char *start_name,
 	const char* cmt_hash;
 	if ((cmt_hash = get_hex_hash_by_bname(start_name))) {
 		if (inc_ref_count(cmt_hash))
-			fprintf(stderr, "Error incrementing refcount of\
-					 a commit after branch creation\n");
+			fprintf(stderr, "Error incrementing reference count "
+				"of a commit after branch creation\n");
 	} else {
-		fprintf(stderr, "Cant get commit hash when creating branch\n");
+		fprintf(stderr, "Can't get commit hash when creating branch\n");
 	}
 
 	strbuf_release(&ref);

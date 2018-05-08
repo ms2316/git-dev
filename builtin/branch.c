@@ -259,12 +259,13 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			goto next;
 		}
 
-		// Remember commit referenced by the branch
+		// Remember commit referenced by the branch to be deleted
 		struct object_id cid;
 		struct commit* cmt;
 		if (get_oid(bname.buf, &cid) ||
 		    !(cmt = lookup_commit_reference(&cid)))
-			fprintf(stderr, "Can't get commit before branch deletion\n");
+			fprintf(stderr, "Cannot get a commit referenced by "
+				"the branch to be deleted\n");
 
 		if (delete_ref(NULL, name, is_null_oid(&oid) ? NULL : &oid,
 			       REF_NODEREF)) {
@@ -276,9 +277,10 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			goto next;
 		}
 
-		// Run refcounting GC on the remembered commit
+		// Run reference-counting GC on the remembered commit
 		if (cmt && refcount_gc(cmt, PROCESS_PARENTS))
-			fprintf(stderr, "Refcounting GC exited with error\n");
+			fprintf(stderr, "Reference-counting garbage collector "
+				"exited with an error when deleting branch\n");
 
 		if (!quiet) {
 			printf(remote_branch

@@ -17,7 +17,7 @@ int close_database(DB *dbp) {
 	int ret;
 
 	if (dbp && (ret = dbp->close(dbp, 0))) {
-		fprintf(stderr, "Database close failed: %s\n", db_strerror(ret));
+		fprintf(stderr, "DB close failed: %s\n", db_strerror(ret));
 		return ret;
 	}
 
@@ -88,7 +88,8 @@ int add_to_db_overwriting(const char* _key, int count) {
 	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)))
 		dbp->err(dbp, ret, "DB->put");
 	else {
-		printf("db: %s: key stored with value %d.\n", (char *)key.data, count);
+		printf("db: %s: key stored with value %d.\n",
+			(char *)key.data, count);
 	}
 
 	close_database(dbp);
@@ -119,7 +120,7 @@ int get_ref_count(const char* _key) {
 	} else {
 		count = *((int*)data.data);
 		printf("db: %s: key retrieved: data was %d.\n",
-				(char *)key.data, count );
+			(char *)key.data, count );
 	}
 
 	close_database(dbp);
@@ -131,10 +132,9 @@ int is_garbage(const char* _key) {
 }
 
 int inc_ref_count(const char* _key) {
-
 	int count = get_ref_count(_key);
 
-	// check if the key exists at all
+	// Check if the key is in the database
 	if (count < 0)
 		count = 0;
 
@@ -142,18 +142,16 @@ int inc_ref_count(const char* _key) {
 }
 
 int dec_ref_count(const char* _key) {
-
 	int count = get_ref_count(_key);
 
 	if (count == 0) {
-		fprintf(stderr, "Semantic Error: The refcount is already zero\
-				 and can't be negative\n");
+		fprintf(stderr, "Semantic Error: The refcount is already zero "
+			"and can't be negative\n");
 		return -1;
 	}
-
 	if (count < 0) {
-		fprintf(stderr, "Semantic Error: Trying to decrement refcount\
-				 of a key not in DB\n");
+		fprintf(stderr, "Semantic Error: Trying to decrement refcount "
+			"of a key not in database\n");
 		return -1;
 	}
 

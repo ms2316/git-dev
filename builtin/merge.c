@@ -33,8 +33,8 @@
 #include "sequencer.h"
 #include "string-list.h"
 #include "packfile.h"
-#include "refcounter.h"
 #include "ledger.h"
+#include "refcounter.h"
 
 #define DEFAULT_TWOHEAD (1<<0)
 #define DEFAULT_OCTOPUS (1<<1)
@@ -830,20 +830,19 @@ static int merge_trivial(struct commit *head, struct commit_list *remoteheads)
 		die(_("failed to write commit object"));
 	finish(head, remoteheads, &result_commit, "In-index merge");
 
-	// Initialize the refcount of a freshly created commit
+	// Initialize the reference count of a created commit
 	struct commit* cmt;
 	if (!(cmt = lookup_commit_reference(&result_commit)) ||
 			init_commit_refcount(cmt)) {
-		fprintf(stderr, "Failure initializing commit\
-				 in merge/merge_trivial\n");
+		fprintf(stderr, "Failure initializing reference count "
+			"of a commit after a trivial merge\n");
 	}
 
-	// Increment refcount of merged remotes
+	// Increment reference count of merged remotes
 	for (struct commit_list *l = merged; l; l = l->next) {
-		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
-			fprintf(stderr, "Error incrementing refcount of remote\
-					 commit after merge\n");
-		}
+		if (inc_ref_count(oid_to_hex(&(l->item->object.oid))))
+			fprintf(stderr, "Error incrementing reference count "
+				"of a remote commit after trivial merge\n");
 	}
 
 	drop_save();
@@ -883,15 +882,15 @@ static int finish_automerge(struct commit *head,
 	struct commit* cmt;
 	if (!(cmt = lookup_commit_reference(&result_commit)) ||
 			init_commit_refcount(cmt)) {
-		fprintf(stderr, "Failure initializing commit in\
-				finish_automerge\n");
+		fprintf(stderr, "Failure initializing reference count "
+			"of a commit after automerge\n");
 	}
 
 	// Increment refcount of merged commits
 	for (struct commit_list *l = merged; l; l = l->next) {
 		if (inc_ref_count(oid_to_hex(&(l->item->object.oid)))) {
-			fprintf(stderr, "Error incrementing refcount of remote\
-					 commit after merge\n");
+			fprintf(stderr, "Error incrementing reference count "
+				"of a remote commit after automerge\n");
 		}
 	}
 
@@ -1423,7 +1422,6 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 			!common->next &&
 			!oidcmp(&common->item->object.oid, &head_commit->object.oid)) {
 		/* Again the most common case of merging one remote. */
-
 		struct strbuf msg = STRBUF_INIT;
 		struct commit *commit;
 
@@ -1450,18 +1448,19 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 			ret = 1;
 			goto done;
 		}
+
 		finish(head_commit, remoteheads, &commit->object.oid, msg.buf);
 		drop_save();
 
-		// After fast forward merge increment refcount of new head
-		// and decrement refcount of head_commit
+		// Increment reference count of new head and decrement
+		// referenece count of head_commit after ff-merge
 		if (inc_ref_count(oid_to_hex(&commit->object.oid))) {
-			fprintf(stderr, "Error incrementing refcount of commit\
-					 in the most common merge\n");
+			fprintf(stderr, "Error incrementing reference count "
+				"of new head after ff-merge\n");
 		}
 		if (dec_ref_count(oid_to_hex(&head_commit->object.oid))) {
-			fprintf(stderr, "Error decrementing refcount of commit\
-					 in the most common merge\n");
+			fprintf(stderr, "Error decrementing reference count "
+				"of head_commit after ff-merge\n");
 		}
 		goto done;
 	} else if (!remoteheads->next && common->next)
